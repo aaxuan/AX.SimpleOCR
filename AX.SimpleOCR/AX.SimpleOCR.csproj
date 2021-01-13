@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>AX.SimpleOCR.Program</StartupObject>
+    <ApplicationIcon>text_editor_128px_1295743_easyicon.net.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

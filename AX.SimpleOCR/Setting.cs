@@ -12,7 +12,7 @@ namespace AX.SimpleOCR
         public static void InitSettingFile()
         {
             if (File.Exists(SettingFileName) == false)
-            { File.WriteAllText(SettingFileName, Newtonsoft.Json.JsonConvert.SerializeObject(new Setting())); }
+            { File.WriteAllText(SettingFileName, JsonConvert.SerializeObject(new Setting())); }
         }
 
         //尝试初始化配置
@@ -24,13 +24,13 @@ namespace AX.SimpleOCR
             var settingJsonStr = File.ReadAllText(SettingFileName);
             Setting setting = JsonConvert.DeserializeObject<Setting>(settingJsonStr);
             if (string.IsNullOrWhiteSpace(setting.ApiKey) || string.IsNullOrWhiteSpace(setting.SecretKey))
-            { message = "解析配置文件异常 ApiKey/SecretKey 不能为空"; return null; }
-            message = "配置读取成功";
+            { message = "请配置 ApiKey / SecretKey"; return null; }
+            message = "读取配置成功";
             return setting;
         }
 
-        public string ApiKey { get; set; }
-        public string SecretKey { get; set; }
+        public string ApiKey { get; set; } = string.Empty;
+        public string SecretKey { get; set; } = string.Empty;
         public int Timeout { get; set; } = 60000;
         public bool OnScreenshotVisibleForm { get; set; } = true;
     }
