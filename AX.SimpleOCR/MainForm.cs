@@ -33,7 +33,7 @@ namespace AX.SimpleOCR
             if (result != 0)
             {
                 var errorCode = Marshal.GetLastWin32Error();
-                SettoolStripStatusLabelText($"注册热键失败 注册返回:{result} 错误码:{errorCode}");
+                SettoolStripStatusLabelText($"注册热键失败  注册返回:{result}  错误码:{errorCode}");
             }
             else
             {
@@ -46,6 +46,14 @@ namespace AX.SimpleOCR
 
             //初始化配置
             LoadSetting();
+        }
+
+        //窗体关闭
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //注销全局热键
+            UnregisterHotKey(Handle, 99999);
+            SettoolStripStatusLabelText("注销热键成功");
         }
 
         //工具栏-设置
@@ -65,9 +73,20 @@ namespace AX.SimpleOCR
         //任务栏图标双击
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            if (WindowState == FormWindowState.Minimized)
             {
                 WindowState = FormWindowState.Normal;
+                Show();
+                Focus();
+            }
+        }
+
+        //窗体尺寸变化
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
             }
         }
 
@@ -157,15 +176,6 @@ namespace AX.SimpleOCR
             int id                      //要取消热键的ID
             );
 
-        #endregion 全局热键
-
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            //注销全局热键
-            UnregisterHotKey(Handle, 99999);
-            SettoolStripStatusLabelText("注销热键成功");
-        }
-
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == 0x0312)
@@ -179,5 +189,9 @@ namespace AX.SimpleOCR
 
             base.WndProc(ref m);
         }
+
+        #endregion 全局热键
+
+
     }
 }
