@@ -117,6 +117,9 @@ namespace AX.SimpleOCR
 
         public void Ocr()
         {
+            if (CurrentSetting == null)
+            { MessageBox.Show("当前配置存在问题，请先配置"); }
+
             // 是否隐藏窗体 隐藏后延时1s 防止截屏软件包含窗口残影
             if (CurrentSetting.OnScreenshotVisibleForm)
             { this.Visible = false; Thread.Sleep(1000); }
@@ -191,7 +194,5 @@ namespace AX.SimpleOCR
         }
 
         #endregion 全局热键
-
-
     }
 }
