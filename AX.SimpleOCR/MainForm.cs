@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -17,22 +18,23 @@ namespace AX.SimpleOCR
         private void MainForm_Load(object sender, EventArgs e)
         {
             Text = "AX.SimpleOCR - 简单截图 OCR";
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             //界面
-            notifyIcon.Visible = true; //显示托盘图标
-            ShowInTaskbar = false;//图标不显示在任务栏
+            //notifyIcon.Visible = true; //显示托盘图标
+            //ShowInTaskbar = false;//图标不显示在任务栏
             pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
 
             //注册全局热键
-            var result = RegisterHotKey(Handle, 99999, 2, Keys.Q);
-            if (result != 0)
-            {
-                var errorCode = Marshal.GetLastWin32Error();
-                SettoolStripStatusLabelText($"注册热键失败  注册返回:{result}  错误码:{errorCode}");
-            }
-            else
-            {
-                SettoolStripStatusLabelText($"注册热键成功 {result}");
-            }
+            //var result = RegisterHotKey(Handle, 99999, 2, Keys.Q);
+            //if (result != 0)
+            //{
+            //    var errorCode = Marshal.GetLastWin32Error();
+            //    SettoolStripStatusLabelText($"注册热键失败  注册返回:{result}  错误码:{errorCode}");
+            //}
+            //else
+            //{
+            //    SettoolStripStatusLabelText($"注册热键成功 {result}");
+            //}
 
             //菜单项点击
             toolStripMenuItemScreenshot.Click += ToolStripMenuItemScreenshot_Click;
