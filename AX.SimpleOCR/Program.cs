@@ -34,7 +34,7 @@ namespace AX.SimpleOCR
         private static void ShowExceptionMsg(Exception exception)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"异常时间：{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            sb.AppendLine($"异常时间：{DateTime.Now.ToString("G")}");
             if (exception != null)
             {
                 sb.AppendLine($"异常类型：{exception.GetType().FullName}");
@@ -46,7 +46,7 @@ namespace AX.SimpleOCR
                 sb.AppendLine($"异常信息已复制到粘贴板。");
             }
             Clipboard.SetDataObject(exception.Message);
-            MessageBox.Show(sb.ToString(), "异常信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(sb.ToString(), "全局异常信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

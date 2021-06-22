@@ -1,23 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using TencentCloud.Common;
-using TencentCloud.Common.Profile;
-using TencentCloud.Ocr.V20181119;
-using TencentCloud.Ocr.V20181119.Models;
 
 namespace AX.SimpleOCR
 {
     public partial class MainForm : Form
     {
-        private Setting CurrentSetting { get; set; }
-
         public MainForm()
         {
             InitializeComponent();
@@ -46,10 +36,6 @@ namespace AX.SimpleOCR
 
             //菜单项点击
             toolStripMenuItemScreenshot.Click += ToolStripMenuItemScreenshot_Click;
-            toolStripMenuItemSetting.Click += ToolStripMenuItemSetting_Click;
-
-            //初始化配置
-            LoadSetting();
         }
 
         //窗体关闭
@@ -60,18 +46,16 @@ namespace AX.SimpleOCR
             SettoolStripStatusLabelText("注销热键成功");
         }
 
-        //工具栏-设置
-        private void ToolStripMenuItemSetting_Click(object sender, EventArgs e)
-        {
-            var process = Process.Start("notepad.exe", Setting.SettingFileName);
-            process.WaitForExit();
-            LoadSetting();
-        }
-
         //工具栏-截图
         private void ToolStripMenuItemScreenshot_Click(object sender, EventArgs e)
         {
             Ocr();
+        }
+
+        //工具栏-退出
+        private void toolStripMenuItemExit_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
 
         //任务栏图标双击
@@ -96,18 +80,6 @@ namespace AX.SimpleOCR
 
         #region 内部方法
 
-        private void LoadSetting()
-        {
-            CurrentSetting = Setting.Init(out string message);
-            if (CurrentSetting == null)
-            {
-                MessageBox.Show(message, "读取配置文件异常", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                SettoolStripStatusLabelText(message);
-                return;
-            }
-            SettoolStripStatusLabelText(message);
-        }
-
         private void SettoolStripStatusLabelText(string message)
         {
             message = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
@@ -117,11 +89,8 @@ namespace AX.SimpleOCR
 
         public void Ocr()
         {
-            if (CurrentSetting == null)
-            { MessageBox.Show("当前配置存在问题，请先配置"); }
-
             // 是否隐藏窗体 隐藏后延时1s 防止截屏软件包含窗口残影
-            if (CurrentSetting.OnScreenshotVisibleForm)
+            if (ConfigManager.Config.OnScreenshotVisibleForm)
             { this.Visible = false; Thread.Sleep(1000); }
 
             // 清除粘贴板
@@ -133,53 +102,23 @@ namespace AX.SimpleOCR
             snapShotProcess.WaitForExit();
 
             // 从粘贴板读取截图 无图片则结束
-            if (Clipboard.ContainsImage() == false) { this.Visible = true; return; }
+            if (Clipboard.ContainsImage() == false) { this.Visible = true; SettoolStripStatusLabelText("未读取到图片，请重试"); return; }
             pictureBox.Image = Clipboard.GetImage();
 
             // 调用 OCR
             Stopwatch watch = new Stopwatch();
             watch.Start();
-
-            pictureBox.Image.Save("ocr_temporaryfile.png", System.Drawing.Imaging.ImageFormat.Png);
-            var imageByte = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ocr_temporaryfile.png"));
-            var resultJobj = GetApi(Convert.ToBase64String(imageByte));
-            var resultWodsJArry = JArray.Parse(resultJobj["TextDetections"].ToString());
-            var sb = new StringBuilder("");
-            foreach (var item in resultWodsJArry)
-            { sb.AppendLine(item["DetectedText"].ToString()); }
-
+            var result = new OCRProvider.TencentCloudOCRProvider().OCR(pictureBox.Image);
             watch.Stop();
 
             //显示结果
-            textBox.Text = sb.ToString();
+            textBox.Text = result;
             this.Visible = true;
 
             // 自动复制到粘贴板
-            Clipboard.SetText(sb.ToString());
-            SettoolStripStatusLabelText($"识别成功 调用耗时:{watch.ElapsedMilliseconds.ToString()}ms");
+            Clipboard.SetText(result);
+            SettoolStripStatusLabelText($"识别成功 调用耗时:{watch.ElapsedMilliseconds}ms 已复制到粘贴板");
         }
-
-        public JObject GetApi(string imgbase64)
-        {
-            Credential cred = new Credential
-            {
-                SecretId = CurrentSetting.ApiKey,
-                SecretKey = CurrentSetting.SecretKey
-            };
-
-            ClientProfile clientProfile = new ClientProfile();
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.Endpoint = ("ocr.tencentcloudapi.com");
-            clientProfile.HttpProfile = httpProfile;
-
-            OcrClient client = new OcrClient(cred, "ap-beijing", clientProfile);
-            AdvertiseOCRRequest req = new AdvertiseOCRRequest();
-
-            req.ImageBase64 = imgbase64;
-
-            AdvertiseOCRResponse resp = client.AdvertiseOCRSync(req);
-            return JObject.Parse(AbstractModel.ToJsonString(resp)); 
-        } 
 
         #endregion 内部方法
 

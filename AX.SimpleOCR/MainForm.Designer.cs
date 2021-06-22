@@ -35,7 +35,7 @@ namespace AX.SimpleOCR
             this.textBox = new System.Windows.Forms.TextBox();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItemScreenshot = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemSetting = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
@@ -70,7 +70,7 @@ namespace AX.SimpleOCR
             // 
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemScreenshot,
-            this.toolStripMenuItemSetting});
+            this.toolStripMenuItemExit});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.Size = new System.Drawing.Size(784, 25);
@@ -84,11 +84,12 @@ namespace AX.SimpleOCR
             this.toolStripMenuItemScreenshot.Size = new System.Drawing.Size(44, 21);
             this.toolStripMenuItemScreenshot.Text = "截图";
             // 
-            // toolStripMenuItemSetting
+            // toolStripMenuItemExit
             // 
-            this.toolStripMenuItemSetting.Name = "toolStripMenuItemSetting";
-            this.toolStripMenuItemSetting.Size = new System.Drawing.Size(44, 21);
-            this.toolStripMenuItemSetting.Text = "设置";
+            this.toolStripMenuItemExit.Name = "toolStripMenuItemExit";
+            this.toolStripMenuItemExit.Size = new System.Drawing.Size(44, 21);
+            this.toolStripMenuItemExit.Text = "退出";
+            this.toolStripMenuItemExit.Click += new System.EventHandler(this.toolStripMenuItemExit_Click);
             // 
             // statusStrip
             // 
@@ -145,8 +146,8 @@ namespace AX.SimpleOCR
         private System.Windows.Forms.MenuStrip menuStrip;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemScreenshot;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSetting;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemExit;
     }
 }
