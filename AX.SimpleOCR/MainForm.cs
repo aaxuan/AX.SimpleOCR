@@ -1,17 +1,21 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using TencentCloud.Common;
+using TencentCloud.Common.Profile;
+using TencentCloud.Ocr.V20181119;
+using TencentCloud.Ocr.V20181119.Models;
 
 namespace AX.SimpleOCR
 {
     public partial class MainForm : Form
     {
-        private Baidu.Aip.Ocr.Ocr BaiDuAIClient { get; set; }
         private Setting CurrentSetting { get; set; }
 
         public MainForm()
@@ -102,10 +106,6 @@ namespace AX.SimpleOCR
                 return;
             }
             SettoolStripStatusLabelText(message);
-
-            //初始
-            BaiDuAIClient = new Baidu.Aip.Ocr.Ocr(CurrentSetting.ApiKey, CurrentSetting.SecretKey);
-            BaiDuAIClient.Timeout = CurrentSetting.Timeout;
         }
 
         private void SettoolStripStatusLabelText(string message)
@@ -137,27 +137,49 @@ namespace AX.SimpleOCR
             pictureBox.Image = Clipboard.GetImage();
 
             // 调用 OCR
-            System.Diagnostics.Stopwatch watch = new Stopwatch();
+            Stopwatch watch = new Stopwatch();
             watch.Start();
 
             pictureBox.Image.Save("ocr_temporaryfile.png", System.Drawing.Imaging.ImageFormat.Png);
-            var resultJObj = BaiDuAIClient.General(File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ocr_temporaryfile.png")));
-            var resultWodsJArry = JArray.Parse(resultJObj["words_result"].ToString());
+            var imageByte = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ocr_temporaryfile.png"));
+            var resultJobj = GetApi(Convert.ToBase64String(imageByte));
+            var resultWodsJArry = JArray.Parse(resultJobj["TextDetections"].ToString());
             var sb = new StringBuilder("");
             foreach (var item in resultWodsJArry)
-            { sb.AppendLine(item["words"].ToString()); }
+            { sb.AppendLine(item["DetectedText"].ToString()); }
 
             watch.Stop();
 
-            // 显示结果
+            //显示结果
             textBox.Text = sb.ToString();
             this.Visible = true;
 
             // 自动复制到粘贴板
             Clipboard.SetText(sb.ToString());
-
             SettoolStripStatusLabelText($"识别成功 调用耗时:{watch.ElapsedMilliseconds.ToString()}ms");
         }
+
+        public JObject GetApi(string imgbase64)
+        {
+            Credential cred = new Credential
+            {
+                SecretId = CurrentSetting.ApiKey,
+                SecretKey = CurrentSetting.SecretKey
+            };
+
+            ClientProfile clientProfile = new ClientProfile();
+            HttpProfile httpProfile = new HttpProfile();
+            httpProfile.Endpoint = ("ocr.tencentcloudapi.com");
+            clientProfile.HttpProfile = httpProfile;
+
+            OcrClient client = new OcrClient(cred, "ap-beijing", clientProfile);
+            AdvertiseOCRRequest req = new AdvertiseOCRRequest();
+
+            req.ImageBase64 = imgbase64;
+
+            AdvertiseOCRResponse resp = client.AdvertiseOCRSync(req);
+            return JObject.Parse(AbstractModel.ToJsonString(resp)); 
+        } 
 
         #endregion 内部方法
 
