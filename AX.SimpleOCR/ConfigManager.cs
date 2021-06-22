@@ -27,7 +27,7 @@ namespace AX.SimpleOCR
             if (string.IsNullOrWhiteSpace(Config.ApiKey) || string.IsNullOrWhiteSpace(Config.SecretKey))
             {
                 MessageBox.Show("您尚未配置调用密钥", "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFileName));
+                Process.Start("notepad.exe",Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFileName));
                 Environment.Exit(0);
             }
             return;
