@@ -6,6 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>AX.SimpleOCR.Program</StartupObject>
     <ApplicationIcon>text_editor_128px_1295743_easyicon.net.ico</ApplicationIcon>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
