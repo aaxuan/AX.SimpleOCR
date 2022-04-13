@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>AX.SimpleOCR.Program</StartupObject>
     <ApplicationIcon>text_editor_128px_1295743_easyicon.net.ico</ApplicationIcon>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TencentCloudSDK" Version="3.0.307" />
+    <PackageReference Include="TencentCloudSDK" Version="3.0.498" />
   </ItemGroup>
 
   <ItemGroup>
